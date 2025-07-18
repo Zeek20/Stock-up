@@ -1,0 +1,154 @@
+[{
+  "_id": {
+    "$oid": "6870a01741fd07e830d197b2"
+  },
+  "name": "Surf Excel",
+  "company": "Hindustan Unilever",
+  "price": 145,
+  "quantity": 80,
+  "barcode": "8901030789960"
+},
+{
+  "_id": {
+    "$oid": "6870a01741fd07e830d197b3"
+  },
+  "name": "Parle-G Biscuits",
+  "company": "Parle Products",
+  "price": 10,
+  "quantity": 0,
+  "barcode": "8901063031011"
+},
+{
+  "_id": {
+    "$oid": "6870a01741fd07e830d197b4"
+  },
+  "name": "Colgate Toothpaste",
+  "company": "Colgate-Palmolive",
+  "price": 95,
+  "quantity": 115,
+  "barcode": "8901314001769"
+},
+{
+  "_id": {
+    "$oid": "6870a01741fd07e830d197b5"
+  },
+  "name": "Maggi Noodles",
+  "company": "Nestlé India",
+  "price": 12,
+  "quantity": 350,
+  "barcode": "8901058866912"
+},
+{
+  "_id": {
+    "$oid": "6870a01741fd07e830d197b6"
+  },
+  "name": "Dettol Handwash",
+  "company": "Reckitt Benckiser",
+  "price": 82,
+  "quantity": 11,
+  "barcode": "8901394001039"
+},
+{
+  "_id": {
+    "$oid": "6870a01741fd07e830d197b7"
+  },
+  "name": "Amul Butter",
+  "company": "Amul",
+  "price": 55,
+  "quantity": 0,
+  "barcode": "8901262012467"
+},
+{
+  "_id": {
+    "$oid": "6870a01741fd07e830d197b8"
+  },
+  "name": "Dabur Honey",
+  "company": "Dabur India",
+  "price": 199,
+  "quantity": 90,
+  "barcode": "8901207020202"
+},
+{
+  "_id": {
+    "$oid": "6870a01741fd07e830d197b9"
+  },
+  "name": "Bru Coffee",
+  "company": "Hindustan Unilever",
+  "price": 110,
+  "quantity": 0,
+  "barcode": "8901030421051"
+},
+{
+  "_id": {
+    "$oid": "6870d507c3f33eb0c73970ce"
+  },
+  "name": "Pepsi Max",
+  "company": "Pepsi zero, PepsiCo",
+  "price": 120,
+  "quantity": 400,
+  "barcode": "3502110009357"
+},
+{
+  "_id": {
+    "$oid": "68726cb5e5a4f69f64cb0b99"
+  },
+  "barcode": "8901491100519",
+  "name": "Kurkure",
+  "company": "Kurkure",
+  "quantity": 88,
+  "price": 10
+},
+{
+  "_id": {
+    "$oid": "6874dac6c56908fc3cbdc259"
+  },
+  "barcode": "8904043900026",
+  "name": "Fortune Sunflower Oil 1L",
+  "quantity": 30,
+  "price": 145
+},
+{
+  "_id": {
+    "$oid": "6875d54126e21438b2aa991a"
+  },
+  "barcode": "8901138500005",
+  "name": "Amul Butter 500g",
+  "quantity": 25,
+  "price": 275
+},
+{
+  "_id": {
+    "$oid": "6875d54e26e21438b2aa991c"
+  },
+  "barcode": "8906013030015",
+  "name": "Patanjali Aloe Vera Juice",
+  "quantity": 40,
+  "price": 90
+},
+{
+  "_id": {
+    "$oid": "68774da376aff89a9d9d107b"
+  },
+  "barcode": "8901030711002",
+  "name": "Dabur Chyawanprash 1kg",
+  "quantity": 10,
+  "price": 350
+},
+{
+  "_id": {
+    "$oid": "6878c116b6736c8fe40a4dac"
+  },
+  "barcode": "45234234342",
+  "name": "Chrunchex",
+  "quantity": 55,
+  "price": 10
+},
+{
+  "_id": {
+    "$oid": "6878ce210b6fd66c877e0da0"
+  },
+  "barcode": "5634342134",
+  "name": "Safola oill",
+  "quantity": 45,
+  "price": 750
+}]

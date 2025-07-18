@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Sales — Stockup</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --bg: #121212;
+      --card: #1c1c1c;
+      --input: #181818;
+      --text: #f1f1f1;
+      --muted: #777;
+      --accent: #2ed573;
+      --error: #e74c3c;
+      --border: #444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+
+    /* NAV */
+    nav {
+      background: var(--card);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      color: var(--accent);
+    }
+
+    .nav-links a {
+      margin-left: 1rem;
+      color: var(--text);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    /* MAIN GRID */
+    .content {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 3fr 1fr;
+      gap: 2rem;
+      padding: 1.5rem;
+    }
+
+    .sale-panel {
+      overflow-y: auto;
+    }
+
+    .form-panel {
+      overflow-y: auto;
+    }
+
+    /* SALES TABLE */
+    .list-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .list-panel table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      flex: 1;
+    }
+
+    .list-panel thead {
+      position: sticky;
+      top: 0;
+      background: var(--card);
+    }
+
+    th,
+    td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      word-wrap: break-word;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: normal;
+    }
+
+    tbody tr:hover td {
+      background: var(--card);
+    }
+
+    /* make total column green */
+    td.total-col {
+      color: var(--accent);
+    }
+
+    /* FORM */
+    .form-box {
+      background: var(--card);
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .form-box h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: var(--accent);
+      font-size: 1.4rem;
+    }
+
+    .form-row {
+      position: relative;
+      margin-bottom: 1.2rem;
+    }
+
+    .form-row i {
+      position: absolute;
+      top: 50%;
+      left: 12px;
+      transform: translateY(-50%);
+      color: var(--accent);
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: .65rem .65rem .65rem 2.5rem;
+      background: var(--input);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      transition: border .2s, box-shadow .2s;
+      font-size: .95rem;
+      appearance: none;
+    }
+
+    select {
+      padding-right: 1rem;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 4px var(--accent);
+    }
+
+    button {
+      margin-top: auto;
+      padding: .75rem;
+      background: var(--accent);
+      border: none;
+      border-radius: 6px;
+      color: var(--bg);
+      font-weight: bold;
+      cursor: pointer;
+      transition: background .2s, transform .2s, box-shadow .2s;
+    }
+
+    button:hover {
+      background: #28c360;
+      transform: scale(1.03);
+      box-shadow: 0 0 10px #2ed57388;
+    }
+
+    .feedback {
+      margin-top: .75rem;
+      text-align: center;
+      font-size: .9rem;
+      color: var(--error);
+    }
+
+    /* sales summary under form */
+    .sales-summary {
+      margin-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+    }
+
+    .sales-summary p {
+      display: flex;
+      justify-content: space-between;
+      font-size: .95rem;
+      margin-bottom: .5rem;
+    }
+
+    .sales-summary span.value {
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    /* MODAL */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--card);
+      padding: 1.5rem;
+      border-radius: 8px;
+      width: 320px;
+      text-align: center;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.7);
+    }
+
+    .modal h3 {
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .modal p {
+      margin: .5rem 0;
+      font-size: .95rem;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: .5rem;
+      margin-top: 1rem;
+    }
+
+    .modal-buttons button {
+      flex: 1;
+      padding: .6rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      border: none;
+      transition: background .2s;
+    }
+
+    #confirm-btn {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    #confirm-btn:hover {
+      background: #28c360;
+    }
+
+    #cancel-btn {
+      background: var(--bg);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+
+    #cancel-btn:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav>
+    <div class="nav-logo"><i class="fas fa-boxes"></i> Stockup</div>
+    <div class="nav-links" id="nav-links">
+    </div>
+  </nav>
+
+  <div class="content">
+    <!-- SALES LIST -->
+    <div class="sale-panel">
+      <div class="list-panel">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Barcode</th>
+              <th>Product</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Total</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="sales-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- NEW SALE FORM -->
+    <div class="form-panel">
+      <form id="sale-form" class="form-box">
+        <h2><i class="fas fa-shopping-cart"></i> New Sale</h2>
+        <div class="form-row">
+          <i class="fas fa-box-open"></i>
+          <select id="product-select" required>
+            <option value="">Select product</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <i class="fas fa-sort-numeric-up"></i>
+          <input type="number" id="qty-input" placeholder="Quantity" min="1" required />
+        </div>
+        <div class="form-row">
+          <i class="fas fa-indian-rupee-sign"></i>
+          <input type="text" id="price-input" placeholder="Price" readonly />
+        </div>
+        <button type="submit">Sell</button>
+        <div class="feedback" id="sale-feedback"></div>
+      </form>
+
+      <!-- SALES SUMMARY -->
+      <div class="sales-summary">
+        <p>Today's Total: <span class="value" id="today-total">₹0.00</span></p>
+        <p>Overall Total: <span class="value" id="all-total">₹0.00</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRMATION MODAL -->
+  <div class="overlay" id="confirm-overlay">
+    <div class="modal">
+      <h3>Confirm Sale</h3>
+      <p id="modal-product"></p>
+      <p id="modal-qty"></p>
+      <p id="modal-price"></p>
+      <p id="modal-total"></p>
+      <div class="modal-buttons">
+        <button id="confirm-btn">Confirm</button>
+        <button id="cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+    const role = localStorage.getItem("role");
+    const navEl = document.getElementById("nav-links");
+
+    const allLinks = [
+      { href: "dashboard.html", icon: "chart-line", label: "Dashboard" },
+      { href: "inventory.html", icon: "box-open", label: "Inventory", roles: ["admin", "owner"] },
+      { href: "order.html", icon: "clipboard-list", label: "Orders", roles: ["admin", "owner", "employee"] },
+      { href: "supplier.html", icon: "truck", label: "Supplier", roles: ["admin", "supplier"] },
+      { href: "buy.html", icon: "truck-loading", label: "Purchases", roles: ["admin", "owner", "employee"] },
+      { href: "sale.html", icon: "shopping-cart", label: "Sales", roles: ["admin", "owner", "employee"] },
+      { href: "logs.html", icon: "history", label: "User Logs", roles: ["admin", "owner"] },
+      { href: "admin.html", icon: "user-shield", label: "Admin", roles: ["admin", "owner"] },
+      { href: "profile.html", icon: "user-circle", label: "Profile" } // universal
+    ];
+
+    for (const link of allLinks) {
+      if (!link.roles || link.roles.includes(role)) {
+        const a = document.createElement("a");
+        a.href = link.href;
+        a.innerHTML = `<i class="fas fa-${link.icon}"></i> ${link.label}`;
+        navEl.appendChild(a);
+      }
+    }
+
+
+
+
+    const API = 'http://localhost:5000/api';
+    const overlay = document.getElementById('confirm-overlay');
+    const confirmBtn = document.getElementById('confirm-btn');
+    const cancelBtn = document.getElementById('cancel-btn');
+    const saleForm = document.getElementById('sale-form');
+    const fb = document.getElementById('sale-feedback');
+    const todayEl = document.getElementById('today-total');
+    const allEl = document.getElementById('all-total');
+
+    let products = [], pending = {};
+
+    async function loadProducts() {
+      const res = await fetch(`${API}/products`);
+      products = await res.json();
+      const sel = document.getElementById('product-select');
+      sel.innerHTML = '<option value="">Select product</option>';
+      products.forEach(p => {
+        if (p.quantity > 0) {
+          const opt = document.createElement('option');
+          opt.value = p.barcode;
+          opt.textContent = `${p.barcode} — ${p.name}`;
+          opt.dataset.price = p.price;
+          opt.dataset.stock = p.quantity;
+          sel.appendChild(opt);
+        }
+      });
+    }
+
+    function formatMoney(x) {
+      return `₹${x.toFixed(2)}`;
+    }
+
+    async function loadSales() {
+      const res = await fetch(`${API}/sales`);
+      const sales = await res.json();
+      const body = document.getElementById('sales-body');
+      body.innerHTML = '';
+
+      let totalAll = 0;
+      let totalToday = 0;
+      const todayDate = new Date().toISOString().slice(0, 10);
+
+      sales.forEach((s, i) => {
+        const name = (products.find(p => p.barcode === s.barcode) || {}).name || '';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${i + 1}</td>
+          <td>${s.barcode}</td>
+          <td>${name}</td>
+          <td>${s.quantity}</td>
+          <td>${formatMoney(s.price)}</td>
+          <td class="total-col">${formatMoney(s.total)}</td>
+          <td>${new Date(s.sale_date).toLocaleString()}</td>
+        `;
+        body.appendChild(tr);
+
+        totalAll += s.total;
+        if (s.sale_date.slice(0, 10) === todayDate) {
+          totalToday += s.total;
+        }
+      });
+
+      allEl.textContent = formatMoney(totalAll);
+      todayEl.textContent = formatMoney(totalToday);
+    }
+
+    document.getElementById('product-select')
+      .addEventListener('change', e => {
+        const opt = e.target.selectedOptions[0];
+        const price = opt?.dataset.price || '';
+        document.getElementById('price-input').value = price
+          ? formatMoney(parseFloat(price))
+          : '';
+      });
+
+    saleForm.onsubmit = async e => {
+      e.preventDefault();
+      fb.textContent = '';
+
+      const barcode = document.getElementById('product-select').value;
+      const qty = +document.getElementById('qty-input').value;
+      const opt = document.getElementById('product-select').selectedOptions[0];
+
+      if (!barcode) {
+        fb.textContent = 'Please select a product.';
+        return;
+      }
+      const unitPrice = parseFloat(opt.dataset.price);
+      const stock = +opt.dataset.stock;
+      if (qty > stock) {
+        fb.textContent = 'Sell quantity exceeds inventory.';
+        return;
+      }
+
+      pending = {
+        barcode,
+        qty,
+        unitPrice,
+        total: +(unitPrice * qty).toFixed(2),
+        name: opt.textContent.split('—')[1].trim()
+      };
+
+      document.getElementById('modal-product').textContent = `Product: ${pending.name}`;
+      document.getElementById('modal-qty').textContent = `Quantity: ${pending.qty}`;
+      document.getElementById('modal-price').textContent = `Unit Price: ${formatMoney(pending.unitPrice)}`;
+      document.getElementById('modal-total').textContent = `Total: ${formatMoney(pending.total)}`;
+
+      overlay.classList.add('active');
+
+      // clear old handlers
+      confirmBtn.onclick = cancelBtn.onclick = null;
+
+      confirmBtn.onclick = async () => {
+        overlay.classList.remove('active');
+        const res = await fetch(`${API}/sales`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ barcode: pending.barcode, quantity: pending.qty })
+        });
+        const msg = await res.json();
+
+        if (!res.ok) {
+          fb.textContent = msg.error || 'Sale failed.';
+          return;
+        }
+
+        fb.style.color = 'var(--accent)';
+        fb.textContent = `Sold ${pending.qty} × ${formatMoney(pending.unitPrice)} = ${formatMoney(pending.total)}`;
+
+        await loadProducts();
+        await loadSales();
+        saleForm.reset();
+        document.getElementById('price-input').value = '';
+      };
+
+      cancelBtn.onclick = () => {
+        overlay.classList.remove('active');
+      };
+    };
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      await loadProducts();
+      await loadSales();
+    });
+  </script>
+</body>
+
+</html>

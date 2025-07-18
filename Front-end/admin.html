@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin — Stockup</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  <style>
+    :root {
+      --bg: #121212;
+      --card-bg: #1c1c1c;
+      --text: #f1f1f1;
+      --muted: #777;
+      --accent: #2ed573;
+      --warn: #f1c40f;
+      --error: #e74c3c;
+      --border: #444;
+      --hover: rgba(46,213,115,0.1);
+    }
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    nav {
+      background: var(--card-bg);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-size:1.5rem; color: var(--accent); }
+    .nav-links a {
+      margin-left:1rem;
+      color: var(--text);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    .content {
+      flex:1;
+      padding:1.5rem;
+      overflow-x:auto;
+    }
+    h2 {
+      margin-bottom:1rem;
+      color: var(--accent);
+    }
+
+    .table-panel {
+      background: var(--card-bg);
+      border:1px solid var(--border);
+      border-radius:6px;
+      overflow:auto;
+      box-shadow:0 0 6px rgba(0,0,0,0.3);
+    }
+    table {
+      width:100%;
+      border-collapse:collapse;
+    }
+    thead {
+      background: var(--card-bg);
+      position: sticky; top:0;
+      z-index:1;
+    }
+    th, td {
+      padding:0.6rem 1rem;
+      border-bottom:1px solid var(--border);
+      font-size:0.85rem;
+      text-align:left;
+    }
+    th { color: var(--muted); font-weight:normal; }
+    tbody tr:hover td { background: var(--hover); }
+
+    .status-tag {
+      display:inline-block;
+      padding:0.2rem 0.5rem;
+      border-radius:4px;
+      font-size:0.75rem;
+      font-weight:bold;
+    }
+    .status-yes { background:rgba(46,213,115,0.2); color:var(--accent); }
+    .status-no  { background:rgba(231,76,60,0.2);  color:var(--error); }
+
+    .actions button {
+      background:none;
+      border:none;
+      color: var(--text);
+      cursor:pointer;
+      margin-right:0.5rem;
+      font-size:0.9rem;
+      transition:color .2s;
+    }
+    .actions .verify { color: var(--accent); }
+    .actions .verify:hover { color: #28c360; }
+    .actions .edit { color: var(--warn); }
+    .actions .edit:hover { color: #d4ac0d; }
+    .actions .delete { color: var(--error); }
+    .actions .delete:hover { color: #c0392b; }
+    .actions .save { color: var(--accent); }
+    .actions .cancel { color: var(--muted); }
+    .actions .cancel:hover { color: var(--text); }
+    select.role-select {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius:4px;
+      color: var(--text);
+      font-size:0.85rem;
+      padding:0.2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-logo"><i class="fas fa-user-shield"></i> Admin Panel</div>
+    <div class="nav-links"  id="nav-links">
+    </div>
+  </nav>
+
+  <div class="content">
+    <h2>All Users</h2>
+    <div class="table-panel">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Age</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Verified</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="user-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+
+    
+        const role = localStorage.getItem("role");
+  const navEl = document.getElementById("nav-links");
+
+  const allLinks = [
+    { href: "dashboard.html", icon: "chart-line", label: "Dashboard" },
+    { href: "inventory.html", icon: "box-open", label: "Inventory", roles: ["admin", "owner"] },
+    { href: "order.html", icon: "clipboard-list", label: "Orders", roles: ["admin", "owner", "employee"] },
+    { href: "supplier.html", icon: "truck", label: "Supplier", roles: ["admin", "supplier"] },
+    { href: "buy.html", icon: "truck-loading", label: "Purchases", roles: ["admin", "owner", "employee"] },
+    { href: "sale.html", icon: "shopping-cart", label: "Sales", roles: ["admin", "owner", "employee"] },
+    { href: "logs.html", icon: "history", label: "User Logs", roles: ["admin", "owner"] },
+    { href: "admin.html", icon: "user-shield", label: "Admin", roles: ["admin", "owner"] },
+    { href: "profile.html", icon: "user-circle", label: "Profile" } // universal
+  ];
+
+  for (const link of allLinks) {
+    if (!link.roles || link.roles.includes(role)) {
+      const a = document.createElement("a");
+      a.href = link.href;
+      a.innerHTML = `<i class="fas fa-${link.icon}"></i> ${link.label}`;
+      navEl.appendChild(a);
+    }
+  }
+
+
+
+    const API      = 'http://localhost:5000/api';
+    const bodyEl   = document.getElementById('user-body');
+    let users      = [];
+    const ROLES    = ['employee','admin','owner','supplier'];
+
+    // fetch and render
+    async function loadUsers() {
+      const res = await fetch(`${API}/users`);
+      users = await res.json();
+      renderTable(users);
+    }
+
+    // render rows; index i, user u
+    function renderTable(list) {
+      bodyEl.innerHTML = '';
+      list.forEach((u, i) => {
+        const tr = document.createElement('tr');
+        const verifiedTag = u.verified
+          ? `<span class="status-tag status-yes">Yes</span>`
+          : `<span class="status-tag status-no">No</span>`;
+        tr.innerHTML = `
+          <td>${i+1}</td>
+          <td>${u.name}</td>
+          <td class="role-cell">${u.role}</td>
+          <td>${u.age}</td>
+          <td>${u.username}</td>
+          <td>${u.email}</td>
+          <td>${verifiedTag}</td>
+          <td class="actions">
+            ${u.verified
+              ? ''
+              : `<button class="verify" data-uid="${u.username}" title="Verify">
+                   <i class="fas fa-check-circle"></i>
+                 </button>`}
+            <button class="edit" data-uid="${u.username}" title="Edit Role">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="delete" data-uid="${u.username}" title="Delete">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>`;
+        bodyEl.appendChild(tr);
+      });
+      bindActions();
+    }
+
+    // bind button handlers
+    function bindActions() {
+      // verify
+      document.querySelectorAll('.verify').forEach(btn => {
+        btn.onclick = () => verifyUser(btn.dataset.uid);
+      });
+      // delete
+      document.querySelectorAll('.delete').forEach(btn => {
+        btn.onclick = () => deleteUser(btn.dataset.uid);
+      });
+      // edit role
+      document.querySelectorAll('.edit').forEach(btn => {
+        btn.onclick = () => startEdit(btn);
+      });
+    }
+
+    // verify user
+    async function verifyUser(username) {
+      await fetch(`${API}/users/${username}`, {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ verified: true })
+      });
+      loadUsers();
+    }
+
+    // delete user
+    async function deleteUser(username) {
+      await fetch(`${API}/users/${username}`, { method: 'DELETE' });
+      loadUsers();
+    }
+
+    // begin inline edit of role
+    function startEdit(btn) {
+      const tr = btn.closest('tr');
+      const username = btn.dataset.uid;
+      const roleCell = tr.querySelector('.role-cell');
+      const currentRole = roleCell.textContent.trim();
+
+      // build select
+      const select = document.createElement('select');
+      select.className = 'role-select';
+      ROLES.forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r;
+        opt.textContent = r.charAt(0).toUpperCase() + r.slice(1);
+        if (r === currentRole) opt.selected = true;
+        select.appendChild(opt);
+      });
+
+      // replace cell contents
+      roleCell.innerHTML = '';
+      roleCell.appendChild(select);
+
+      // swap buttons: save, cancel
+      const actions = tr.querySelector('.actions');
+      actions.innerHTML = `
+        <button class="save" data-uid="${username}" title="Save">
+          <i class="fas fa-save"></i>
+        </button>
+        <button class="cancel" title="Cancel">
+          <i class="fas fa-times-circle"></i>
+        </button>
+      `;
+
+      // bind save/cancel
+      actions.querySelector('.save').onclick = () => saveRole(username, select.value);
+      actions.querySelector('.cancel').onclick = () => loadUsers();
+    }
+
+    // save new role
+    async function saveRole(username, newRole) {
+      await fetch(`${API}/users/${username}`, {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ role: newRole })
+      });
+      loadUsers();
+    }
+
+    window.addEventListener('DOMContentLoaded', loadUsers);
+  </script>
+</body>
+</html>

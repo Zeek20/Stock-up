@@ -1,0 +1,388 @@
+[{
+  "_id": {
+    "$oid": "68723a29af87c89ffb038952"
+  },
+  "barcode": "12345678",
+  "quantity": 15,
+  "price": 199.99,
+  "total": 2999.85,
+  "sale_date": "2025-07-10T09:15:00"
+},
+{
+  "_id": {
+    "$oid": "68723a29af87c89ffb038953"
+  },
+  "barcode": "87654321",
+  "quantity": 5,
+  "price": 349.5,
+  "total": 1747.5,
+  "sale_date": "2025-07-10T11:30:00"
+},
+{
+  "_id": {
+    "$oid": "68723a29af87c89ffb038954"
+  },
+  "barcode": "23456789",
+  "quantity": 20,
+  "price": 79,
+  "total": 1580,
+  "sale_date": "2025-07-10T14:45:00"
+},
+{
+  "_id": {
+    "$oid": "68723a29af87c89ffb038955"
+  },
+  "barcode": "34567890",
+  "quantity": 8,
+  "price": 129.95,
+  "total": 1039.6,
+  "sale_date": "2025-07-10T16:05:00"
+},
+{
+  "_id": {
+    "$oid": "68723cc5ad4f11322c1e4224"
+  },
+  "barcode": "8901030789960",
+  "quantity": 1,
+  "price": 145,
+  "total": 145,
+  "sale_date": {
+    "$date": "2025-07-12T10:45:25.582Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68723ccbad4f11322c1e4225"
+  },
+  "barcode": "8901030789960",
+  "quantity": 1,
+  "price": 145,
+  "total": 145,
+  "sale_date": {
+    "$date": "2025-07-12T10:45:31.474Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68723db6ad4f11322c1e4226"
+  },
+  "barcode": "3502110009357",
+  "quantity": 10,
+  "price": 120,
+  "total": 1200,
+  "sale_date": {
+    "$date": "2025-07-12T10:49:26.322Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68723dbfad4f11322c1e4227"
+  },
+  "barcode": "3502110009357",
+  "quantity": 10,
+  "price": 120,
+  "total": 1200,
+  "sale_date": {
+    "$date": "2025-07-12T10:49:35.342Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68723e78ad4f11322c1e4228"
+  },
+  "barcode": "3502110009357",
+  "quantity": 1,
+  "price": 120,
+  "total": 120,
+  "sale_date": {
+    "$date": "2025-07-12T10:52:40.683Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68723e88ad4f11322c1e4229"
+  },
+  "barcode": "3502110009357",
+  "quantity": 1,
+  "price": 120,
+  "total": 120,
+  "sale_date": {
+    "$date": "2025-07-12T10:52:56.038Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68723f14ad4f11322c1e422a"
+  },
+  "barcode": "3502110009357",
+  "quantity": 1,
+  "price": 120,
+  "total": 120,
+  "sale_date": {
+    "$date": "2025-07-12T10:55:16.246Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68723fc2ad4f11322c1e422b"
+  },
+  "barcode": "3502110009357",
+  "quantity": 2,
+  "price": 120,
+  "total": 240,
+  "sale_date": {
+    "$date": "2025-07-12T10:58:10.213Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68723fc7ad4f11322c1e422c"
+  },
+  "barcode": "3502110009357",
+  "quantity": 2,
+  "price": 120,
+  "total": 240,
+  "sale_date": {
+    "$date": "2025-07-12T10:58:15.588Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68723fc9ad4f11322c1e422d"
+  },
+  "barcode": "3502110009357",
+  "quantity": 2,
+  "price": 120,
+  "total": 240,
+  "sale_date": {
+    "$date": "2025-07-12T10:58:17.424Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68724072ad4f11322c1e422e"
+  },
+  "barcode": "3502110009357",
+  "quantity": 3,
+  "price": 120,
+  "total": 360,
+  "sale_date": {
+    "$date": "2025-07-12T11:01:06.605Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68724077ad4f11322c1e422f"
+  },
+  "barcode": "3502110009357",
+  "quantity": 3,
+  "price": 120,
+  "total": 360,
+  "sale_date": {
+    "$date": "2025-07-12T11:01:11.693Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6872410fad4f11322c1e4230"
+  },
+  "barcode": "3502110009357",
+  "quantity": 2,
+  "price": 120,
+  "total": 240,
+  "sale_date": {
+    "$date": "2025-07-12T11:03:43.966Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68724193ad4f11322c1e4231"
+  },
+  "barcode": "3502110009357",
+  "quantity": 1,
+  "price": 120,
+  "total": 120,
+  "sale_date": {
+    "$date": "2025-07-12T11:05:55.516Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687242ffad4f11322c1e4232"
+  },
+  "barcode": "3502110009357",
+  "quantity": 2,
+  "price": 120,
+  "total": 240,
+  "sale_date": {
+    "$date": "2025-07-12T11:11:59.545Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6872453fad4f11322c1e4233"
+  },
+  "barcode": "3502110009357",
+  "quantity": 2,
+  "price": 120,
+  "total": 240,
+  "sale_date": {
+    "$date": "2025-07-12T11:21:35.428Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6872499bad4f11322c1e4234"
+  },
+  "barcode": "3502110009357",
+  "quantity": 5,
+  "price": 120,
+  "total": 600,
+  "sale_date": {
+    "$date": "2025-07-12T11:40:11.259Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6874db2dc56908fc3cbdc25a"
+  },
+  "barcode": "8901314001769",
+  "quantity": 10,
+  "price": 95,
+  "total": 950,
+  "sale_date": {
+    "$date": "2025-07-14T10:25:49.593Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6874ddbac56908fc3cbdc25b"
+  },
+  "barcode": "8904043900026",
+  "quantity": 5,
+  "price": 145,
+  "total": 725,
+  "sale_date": {
+    "$date": "2025-07-14T10:36:41.969Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6874e2cdc56908fc3cbdc25c"
+  },
+  "barcode": "8901314001769",
+  "quantity": 10,
+  "price": 95,
+  "total": 950,
+  "sale_date": {
+    "$date": "2025-07-14T10:58:21.629Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6874e3c0c56908fc3cbdc25d"
+  },
+  "barcode": "8901314001769",
+  "quantity": 3,
+  "price": 95,
+  "total": 285,
+  "sale_date": {
+    "$date": "2025-07-14T11:02:24.950Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6874e42bc56908fc3cbdc25e"
+  },
+  "barcode": "8901314001769",
+  "quantity": 2,
+  "price": 95,
+  "total": 190,
+  "sale_date": {
+    "$date": "2025-07-14T11:04:11.365Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6874e445c56908fc3cbdc25f"
+  },
+  "barcode": "8901314001769",
+  "quantity": 1,
+  "price": 95,
+  "total": 95,
+  "sale_date": {
+    "$date": "2025-07-14T11:04:37.937Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6874e5e8c56908fc3cbdc262"
+  },
+  "barcode": "8901314001769",
+  "quantity": 3,
+  "price": 95,
+  "total": 285,
+  "sale_date": {
+    "$date": "2025-07-14T11:11:36.821Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6874e902c56908fc3cbdc263"
+  },
+  "barcode": "8901314001769",
+  "quantity": 1,
+  "price": 95,
+  "total": 95,
+  "sale_date": {
+    "$date": "2025-07-14T11:24:50.815Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6874e924c56908fc3cbdc264"
+  },
+  "barcode": "3502110009357",
+  "quantity": 1,
+  "price": 120,
+  "total": 120,
+  "sale_date": {
+    "$date": "2025-07-14T11:25:24.035Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6875d50c26e21438b2aa9918"
+  },
+  "barcode": "3502110009357",
+  "quantity": 2,
+  "price": 120,
+  "total": 240,
+  "sale_date": {
+    "$date": "2025-07-15T04:11:56.012Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687747d676aff89a9d9d1078"
+  },
+  "barcode": "8901314001769",
+  "quantity": 5,
+  "price": 95,
+  "total": 475,
+  "sale_date": {
+    "$date": "2025-07-16T06:33:58.498Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6878a3432c9a807da6782f1c"
+  },
+  "barcode": "8901314001769",
+  "quantity": 50,
+  "price": 95,
+  "total": 4750,
+  "sale_date": {
+    "$date": "2025-07-17T07:16:19.183Z"
+  }
+}]

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Sign In — Stockup</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        :root {
+            --bg: #121212;
+            --card: #1c1c1c;
+            --input: #181818;
+            --text: #f1f1f1;
+            --muted: #777;
+            --accent: #2ed573;
+            --error: #e74c3c;
+            --border: #444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+            width: 340px;
+        }
+
+        h2 {
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+            text-align: center;
+            font-size: 1.3rem;
+        }
+
+        .input-icon {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .input-icon input,
+        .input-icon select {
+            width: 100%;
+            padding: 0.65rem 0.75rem 0.65rem 2.5rem;
+            background: var(--input);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: border-color .2s;
+        }
+
+        .input-icon input:focus,
+        .input-icon select:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        .icon-user::before {
+            content: "\f007";
+        }
+
+        .icon-role::before {
+            content: "\f507";
+        }
+
+        .icon-lock::before {
+            content: "\f023";
+        }
+
+        .input-icon::before {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            color: var(--muted);
+            pointer-events: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--accent);
+            border: none;
+            border-radius: 6px;
+            color: var(--bg);
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background .2s;
+        }
+
+        .btn:hover {
+            background: #28c360;
+        }
+
+        .feedback {
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+            color: var(--error);
+            text-align: center;
+            min-height: 1.2em;
+        }
+
+        .link {
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .link a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <h2>Sign In</h2>
+        <form id="login-form">
+            <div class="input-icon icon-user">
+                <input type="text" id="username" placeholder="Username" required />
+            </div>
+            <div class="input-icon icon-role">
+                <select id="role" required>
+                    <option value="" disabled selected>Select Role</option>
+                    <option value="employee">Employee</option>
+                    <option value="admin">Admin</option>
+                    <option value="owner">Owner</option>
+                    <option value="supplier">Supplier</option>
+                </select>
+            </div>
+            <div class="input-icon icon-lock">
+                <input type="password" id="password" placeholder="Password" required />
+            </div>
+
+            <button type="submit" class="btn">Sign In</button>
+            <div class="feedback" id="feedback"></div>
+            <div class="link">
+                Don’t have an account? <a href="signup.html">Sign Up</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        localStorage.removeItem('username');
+        localStorage.removeItem('loginTime');
+        const API = 'http://localhost:5000/api';
+        const fb = document.getElementById('feedback');
+        const form = document.getElementById('login-form');
+
+        form.addEventListener('submit', async e => {
+            e.preventDefault();
+            fb.textContent = '';
+
+            const username = form.username.value.trim();
+            const role = form.role.value;
+            const password = form.password.value;
+
+            // 1) Attempt login
+            const res = await fetch(`${API}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+                fb.textContent = data.error || 'Invalid credentials';
+                return;
+            }
+
+            // 2) Verify role
+            if (data.user.role !== role) {
+                fb.textContent = 'Invalid role';
+                return;
+            }
+
+            // 3) Store username for future logs
+
+            localStorage.setItem('username', username);
+            localStorage.setItem('role', role);
+            localStorage.setItem('loginTime', new Date().toISOString());
+
+
+
+            // 4) Redirect to dashboard
+            window.location.href = 'dashboard.html';
+        });
+    </script>
+</body>
+
+</html>

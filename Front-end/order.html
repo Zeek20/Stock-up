@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Orders — Stockup</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  <style>
+    :root {
+      --bg: #121212;
+      --card: #1c1c1c;
+      --input: #181818;
+      --text: #f1f1f1;
+      --muted: #777;
+      --accent: #2ed573;
+      --error: #e74c3c;
+      --border: #444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+
+    /* NAVIGATION */
+    nav {
+      background: var(--card);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-links a {
+      margin-left: 1rem;
+      color: var(--text);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    /* LAYOUT */
+    .content {
+      flex: 1;
+      display: flex;
+      gap: 2rem;
+      padding: 1.5rem;
+      overflow: hidden;
+    }
+
+    .order-panel {
+      flex: 3;
+      overflow-y: auto;
+    }
+
+    .form-panel {
+      flex: 1;
+      align-self: flex-start;
+      overflow-y: auto;
+    }
+
+    /* ORDERS TABLE */
+    .list-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.3);
+      overflow-x: auto;
+    }
+
+    .list-panel h3 {
+      margin: 0;
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--accent);
+      font-size: 1.2rem;
+      background: var(--card);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      background: var(--card);
+    }
+
+    th, td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: normal;
+    }
+
+    tbody tr:hover td {
+      background: var(--card);
+    }
+
+    /* STATUS DOT */
+    .dot {
+      display: inline-block;
+      width: 0.8em;
+      height: 0.8em;
+      border-radius: 50%;
+      margin-right: 0.5em;
+    }
+
+    .dot.pending {
+      background: var(--error);
+    }
+
+    .dot.confirmed {
+      background: var(--accent);
+    }
+
+    /* DELETE BUTTON */
+    .btn {
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 1rem;
+      transition: color 0.2s;
+    }
+
+    .btn:hover {
+      color: var(--error);
+    }
+
+    /* NEW ORDER FORM */
+    .form-box {
+      background: var(--card);
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .form-box h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: var(--accent);
+      font-size: 1.4rem;
+    }
+
+    .form-row {
+      position: relative;
+      margin-bottom: 1.2rem;
+    }
+
+    .form-row i {
+      position: absolute;
+      top: 50%;
+      left: 12px;
+      transform: translateY(-50%);
+      color: var(--accent);
+      pointer-events: none;
+    }
+
+    .form-row input {
+      width: 100%;
+      padding: 0.65rem 0.65rem 0.65rem 2.5rem;
+      background: var(--input);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.95rem;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+
+    .form-row input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 4px var(--accent);
+    }
+
+    .submit-btn {
+      margin-top: auto;
+      padding: 0.75rem;
+      background: var(--accent);
+      border: none;
+      border-radius: 6px;
+      color: var(--bg);
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .submit-btn:hover {
+      background: #28c360;
+      transform: scale(1.03);
+      box-shadow: 0 0 10px #2ed57388;
+    }
+
+    .feedback {
+      margin-top: 0.75rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--error);
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-logo"><i class="fas fa-boxes"></i> Stockup</div>
+    <div class="nav-links" id="nav-links">
+    </div>
+  </nav>
+
+  <div class="content">
+    <!-- LEFT: COMBINED ORDERS LIST -->
+    <div class="order-panel">
+      <div class="list-panel">
+        <h3>All Orders</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Status</th>
+              <th>Order ID</th>
+              <th>Barcode</th>
+              <th>Product Name</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Date</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody id="order-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RIGHT: NEW ORDER FORM -->
+    <div class="form-panel">
+      <form id="order-form" class="form-box">
+        <h2><i class="fas fa-clipboard-list"></i> New Order</h2>
+        <div class="form-row">
+          <i class="fas fa-barcode"></i>
+          <input id="barcode-input" type="text" placeholder="Barcode" required/>
+        </div>
+        <div class="form-row">
+          <i class="fas fa-box-open"></i>
+          <input id="product-name" type="text" placeholder="Product name" required/>
+        </div>
+        <div class="form-row">
+          <i class="fas fa-sort-numeric-up"></i>
+          <input id="order-qty" type="number" min="1" placeholder="Quantity" required/>
+        </div>
+        <div class="form-row">
+          <i class="fas fa-indian-rupee-sign"></i>
+          <input id="order-price" type="number" step="0.01" placeholder="Price" required/>
+        </div>
+        <button type="submit" class="submit-btn">Create Order</button>
+        <div class="feedback" id="order-feedback"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+
+      const role = localStorage.getItem("role");
+  const navEl = document.getElementById("nav-links");
+
+  const allLinks = [
+    { href: "dashboard.html", icon: "chart-line", label: "Dashboard" },
+    { href: "inventory.html", icon: "box-open", label: "Inventory", roles: ["admin", "owner"] },
+    { href: "order.html", icon: "clipboard-list", label: "Orders", roles: ["admin", "owner", "employee"] },
+    { href: "supplier.html", icon: "truck", label: "Supplier", roles: ["admin",  "supplier"] },
+    { href: "buy.html", icon: "truck-loading", label: "Purchases", roles: ["admin", "owner", "employee"] },
+    { href: "sale.html", icon: "shopping-cart", label: "Sales", roles: ["admin", "owner", "employee"] },
+    { href: "logs.html", icon: "history", label: "User Logs", roles: ["admin", "owner"] },
+    { href: "admin.html", icon: "user-shield", label: "Admin", roles: ["admin", "owner"] },
+    { href: "profile.html", icon: "user-circle", label: "Profile" } // universal
+  ];
+
+  for (const link of allLinks) {
+    if (!link.roles || link.roles.includes(role)) {
+      const a = document.createElement("a");
+      a.href = link.href;
+      a.innerHTML = `<i class="fas fa-${link.icon}"></i> ${link.label}`;
+      navEl.appendChild(a);
+    }
+  }
+
+
+
+
+    const API    = 'http://localhost:5000/api';
+    const bodyEl = document.getElementById('order-body');
+    const form   = document.getElementById('order-form');
+    const fb     = document.getElementById('order-feedback');
+
+    async function loadOrders() {
+      const res    = await fetch(`${API}/orders`);
+      const orders = await res.json();
+       orders.sort((a, b) => (b.pending === a.pending ? 0 : (b.pending ? 1 : -1)));
+
+      bodyEl.innerHTML = '';
+
+      orders.forEach((o, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${i + 1}</td>
+          <td><span class="dot ${o.pending ? 'pending' : 'confirmed'}"></span></td>
+          <td>${o.order_id}</td>
+          <td>${o.barcode}</td>
+          <td>${o.product_name}</td>
+          <td>${o.quantity}</td>
+          <td>₹${o.price.toFixed(2)}</td>
+          <td>${new Date(o.order_date).toLocaleString()}</td>
+          <td>
+            <button class="btn delete" data-id="${o.order_id}">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>`;
+        bodyEl.appendChild(tr);
+      });
+
+      document.querySelectorAll('.btn.delete').forEach(btn => {
+        btn.onclick = async () => {
+          await fetch(`${API}/orders/${btn.dataset.id}`, { method: 'DELETE' });
+          await loadOrders();
+        };
+      });
+    }
+
+    form.onsubmit = async e => {
+      e.preventDefault();
+      fb.textContent = '';
+
+      const barcode      = document.getElementById('barcode-input').value.trim();
+      const product_name = document.getElementById('product-name').value.trim();
+      const quantity     = +document.getElementById('order-qty').value;
+      const price        = +document.getElementById('order-price').value;
+
+      if (!barcode || !product_name || quantity < 1 || price <= 0) {
+        fb.textContent = 'Please fill all fields correctly.';
+        return;
+      }
+
+      const order_id = 'ORD' + Date.now();
+      const res = await fetch(`${API}/orders`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          order_id,
+          barcode,
+          product_name,
+          quantity,
+          price,
+          pending: true
+        })
+      });
+
+      const msg = await res.json();
+      if (!res.ok) {
+        fb.textContent = msg.error || 'Order creation failed.';
+        return;
+      }
+
+      fb.style.color = 'var(--accent)';
+      fb.textContent = 'Order created!';
+      await loadOrders();
+      form.reset();
+    };
+
+    window.addEventListener('DOMContentLoaded', loadOrders);
+  </script>
+</body>
+</html>

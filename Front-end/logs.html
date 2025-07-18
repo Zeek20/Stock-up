@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Logs — Stockup</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  <style>
+    :root {
+      --bg: #121212;
+      --card: #1c1c1c;
+      --text: #f1f1f1;
+      --muted: #777;
+      --accent: #2ed573;
+      --border: #444;
+      --hover: rgba(46,213,115,0.1);
+    }
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    nav {
+      background: var(--card);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-size: 1.4rem;
+      color: var(--accent);
+    }
+    .nav-links a {
+      margin-left: 1rem;
+      color: var(--text);
+      text-decoration: none;
+      transition: color .2s;
+      font-size: 0.9rem;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .content {
+      flex: 1;
+      padding: 1.5rem;
+      overflow-x: auto;
+    }
+    h2 {
+      margin-bottom: 1rem;
+      color: var(--accent);
+      font-size: 1.2rem;
+    }
+    .table-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: auto;
+      box-shadow: 0 0 6px rgba(0,0,0,0.3);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead {
+      background: var(--card);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    th, td {
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+      text-align: left;
+      user-select: none;
+    }
+    th {
+      color: var(--muted);
+      font-weight: normal;
+      cursor: pointer;
+    }
+    th.sort-asc::after { content: " ↑"; }
+    th.sort-desc::after { content: " ↓"; }
+    tbody tr:hover td { background: var(--hover); }
+    .no-logs {
+      padding: 1rem;
+      text-align: center;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-logo"><i class="fas fa-history"></i> User Logs</div>
+    <div class="nav-links"  id="nav-links">
+    </div>
+  </nav>
+
+  <div class="content">
+    <h2>Login / Logout Records</h2>
+    <div class="table-panel">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Username</th>
+            <th data-sort="login">Login Time</th>
+            <th data-sort="logout">Logout Time</th>
+            <th>Last Online</th>
+          </tr>
+        </thead>
+        <tbody id="log-body">
+          <tr><td colspan="5" class="no-logs">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+
+    
+        const role = localStorage.getItem("role");
+  const navEl = document.getElementById("nav-links");
+
+  const allLinks = [
+    { href: "dashboard.html", icon: "chart-line", label: "Dashboard" },
+    { href: "inventory.html", icon: "box-open", label: "Inventory", roles: ["admin", "owner"] },
+    { href: "order.html", icon: "clipboard-list", label: "Orders", roles: ["admin", "owner", "employee"] },
+    { href: "supplier.html", icon: "truck", label: "Supplier", roles: ["admin",  "supplier"] },
+    { href: "buy.html", icon: "truck-loading", label: "Purchases", roles: ["admin", "owner", "employee"] },
+    { href: "sale.html", icon: "shopping-cart", label: "Sales", roles: ["admin", "owner", "employee"] },
+    { href: "logs.html", icon: "history", label: "User Logs", roles: ["admin", "owner"] },
+    { href: "admin.html", icon: "user-shield", label: "Admin", roles: ["admin", "owner"] },
+    { href: "profile.html", icon: "user-circle", label: "Profile" } // universal
+  ];
+
+  for (const link of allLinks) {
+    if (!link.roles || link.roles.includes(role)) {
+      const a = document.createElement("a");
+      a.href = link.href;
+      a.innerHTML = `<i class="fas fa-${link.icon}"></i> ${link.label}`;
+      navEl.appendChild(a);
+    }
+  }
+  
+    const API      = 'http://localhost:5000/api';
+    const bodyEl   = document.getElementById('log-body');
+    let logsData   = [];
+    let sortKey    = 'login';
+    let sortDir    = -1;
+
+    // Format ISO timestamp to locale string
+    function fmt(ts) {
+      if (!ts) return '—';
+      return new Date(ts).toLocaleString();
+    }
+
+    // Compute last-online label: minutes if <1h, else hours (integer)
+    function lastOnline(ts) {
+      if (!ts) return '—';
+      const diffMs = Date.now() - new Date(ts).getTime();
+      const mins   = Math.floor(diffMs / 60000);
+      if (mins < 60) return `${mins}m`;
+      const hrs = Math.floor(mins / 60);
+      return `${hrs}h`;
+    }
+
+    // Render rows
+    function renderLogs(list) {
+      if (!list.length) {
+        bodyEl.innerHTML = '<tr><td colspan="5" class="no-logs">No records found</td></tr>';
+        return;
+      }
+      bodyEl.innerHTML = '';
+      list.forEach((r, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${i+1}</td>
+          <td>${r.username}</td>
+          <td>${fmt(r.login)}</td>
+          <td>${fmt(r.logout)}</td>
+          <td>${lastOnline(r.logout)}</td>
+        `;
+        bodyEl.appendChild(tr);
+      });
+    }
+
+    // Sort & render
+    function sortAndRender() {
+      logsData.sort((a, b) => {
+        const ta = new Date(a[sortKey]), tb = new Date(b[sortKey]);
+        return sortDir * (ta - tb);
+      });
+      document.querySelectorAll('th[data-sort]').forEach(th => {
+        th.classList.remove('sort-asc','sort-desc');
+        if (th.dataset.sort === sortKey) {
+          th.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
+        }
+      });
+      renderLogs(logsData);
+    }
+
+    // Fetch + init
+    async function loadLogs() {
+      try {
+        const res = await fetch(`${API}/logs`);
+        logsData = await res.json();
+        sortAndRender();
+      } catch {
+        bodyEl.innerHTML = '<tr><td colspan="5" class="no-logs">Failed to load logs</td></tr>';
+      }
+    }
+
+    // Header click toggles sort
+    document.querySelectorAll('th[data-sort]').forEach(th => {
+      th.addEventListener('click', () => {
+        const key = th.dataset.sort;
+        if (sortKey === key) sortDir = -sortDir;
+        else { sortKey = key; sortDir = -1; }
+        sortAndRender();
+      });
+    });
+
+    window.addEventListener('DOMContentLoaded', loadLogs);
+  </script>
+</body>
+</html>

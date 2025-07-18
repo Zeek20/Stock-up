@@ -1,0 +1,84 @@
+[{
+  "_id": {
+    "$oid": "6123a1b2c3d4e5f678901234"
+  },
+  "name": "Priya Sharma",
+  "role": "employee",
+  "age": 22,
+  "username": "priya22",
+  "email": "priya22@example.com",
+  "password": "Priya@123",
+  "verified": true
+},
+{
+  "_id": {
+    "$oid": "6123a1b2c3d4e5f678901235"
+  },
+  "name": "Rahul Verma",
+  "role": "admin",
+  "age": 30,
+  "username": "rahul30",
+  "email": "rahul30@example.com",
+  "password": "Rahul@456",
+  "verified": true
+},
+{
+  "_id": {
+    "$oid": "6123a1b2c3d4e5f678901236"
+  },
+  "name": "Sandeep Gupta",
+  "role": "owner",
+  "age": 45,
+  "username": "sandeep45",
+  "email": "sandeep45@example.com",
+  "password": "Sandeep@789",
+  "verified": true
+},
+{
+  "_id": {
+    "$oid": "6123a1b2c3d4e5f678901237"
+  },
+  "name": "Arun Patel",
+  "role": "supplier",
+  "age": 35,
+  "username": "arun35",
+  "email": "arun35@example.com",
+  "password": "arun@321",
+  "verified": true
+},
+{
+  "_id": {
+    "$oid": "6123a1b2c3d4e5f678901238"
+  },
+  "name": "Karan Singh",
+  "role": "employee",
+  "age": 27,
+  "username": "karan27",
+  "email": "karan27@example.com",
+  "password": "Karan@654",
+  "verified": true
+},
+{
+  "_id": {
+    "$oid": "6873f9966a7fd709b679fe4e"
+  },
+  "name": "zeek",
+  "role": "admin",
+  "age": 21,
+  "username": "zeek1",
+  "email": "zee@gmail.com",
+  "password": "123456",
+  "verified": true
+},
+{
+  "_id": {
+    "$oid": "6874d7edc56908fc3cbdc254"
+  },
+  "name": "rohit",
+  "role": "supplier",
+  "age": 32,
+  "username": "roh123",
+  "email": "roh@gmail.com",
+  "password": "1122",
+  "verified": true
+}]

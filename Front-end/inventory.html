@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Inventory — Stockup</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link 
+    rel="stylesheet" 
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  <style>
+    :root {
+      --bg: #121212;
+      --card: #1c1c1c;
+      --input: #181818;
+      --text: #f1f1f1;
+      --muted: #777;
+      --accent: #2ed573;    /* green */
+      --warn: #f1c40f;      /* yellow */
+      --error: #e74c3c;     /* red */
+      --border: #444;
+    }
+
+    * { box-sizing: border-box; margin:0; padding:0; }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+
+    /* NAVIGATION */
+    nav {
+      background: var(--card);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-size: 1.5rem;
+      color: var(--accent);
+    }
+    .nav-links a {
+      margin-left: 1rem;
+      color: var(--text);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    /* LAYOUT */
+    .content {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 3fr 1fr;
+      gap: 2rem;
+      padding: 1.5rem;
+      overflow: hidden;
+    }
+
+    /* LEFT: SEARCH + TABLE */
+    .table-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      overflow: hidden;
+    }
+
+    .search-bar {
+      position: relative;
+      max-width: 300px;
+    }
+    .search-bar input {
+      width: 100%;
+      padding: 0.5rem 0.75rem 0.5rem 2rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-size: 0.85rem;
+    }
+    .search-bar .fa-search {
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .table-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: auto;
+      box-shadow: 0 0 6px rgba(0,0,0,0.3);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead {
+      background: var(--card);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    th, td {
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+      text-align: left;
+    }
+    th {
+      color: var(--muted);
+      font-weight: normal;
+    }
+    tbody tr:hover td {
+      background: var(--input);
+    }
+
+    /* STATUS TAG */
+    .status {
+      display: inline-block;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+    .status.in-stock {
+      background: rgba(46,213,115,0.2);
+      color: var(--accent);
+    }
+    .status.shortage {
+      background: rgba(241,196,15,0.2);
+      color: var(--warn);
+    }
+    .status.out-of-stock {
+      background: rgba(231,76,60,0.2);
+      color: var(--error);
+    }
+
+    /* ACTION BUTTONS */
+    .actions button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-right: 0.5rem;
+      transition: color .2s;
+    }
+    .actions .edit {
+      color: var(--accent);
+    }
+    .actions .edit:hover {
+      color: #28c360;
+    }
+    .actions .delete {
+      color: var(--error);
+    }
+    .actions .delete:hover {
+      color: #c0392b;
+    }
+
+    /* RIGHT: FORM */
+    .form-panel {
+      overflow-y: auto;
+      align-self: flex-start;
+    }
+    .form-box {
+      background: var(--card);
+      padding: 1.5rem;
+      border-radius: 6px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-height: 360px;
+    }
+    .form-box h2 {
+      text-align: center;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+    .form-row {
+      position: relative;
+    }
+    .form-row i {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--accent);
+      pointer-events: none;
+      font-size: 0.9rem;
+    }
+    .form-row input {
+      width: 100%;
+      padding: 0.5rem 0.5rem 0.5rem 2rem;
+      background: var(--input);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-size: 0.85rem;
+      transition: border .2s;
+    }
+    .form-row input:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+    .btn {
+      padding: 0.6rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: bold;
+      transition: background .2s;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+    }
+    .btn-primary:hover {
+      background: #28c360;
+    }
+    .btn-lookup {
+      background: var(--muted);
+      color: var(--bg);
+    }
+    .btn-lookup:hover {
+      background: var(--accent);
+    }
+    .feedback {
+      font-size: 0.8rem;
+      color: var(--error);
+      text-align: center;
+      min-height: 1.1em;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-logo"><i class="fas fa-box-open"></i> Inventory</div>
+<div class="nav-links" id="nav-links"></div>
+
+  </nav>
+
+  <div class="content">
+    <!-- LEFT: SEARCH BAR + TABLE -->
+    <div class="table-section">
+      <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input id="searchInput" type="text" placeholder="Search barcode or name…" />
+      </div>
+      <div class="table-panel">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Barcode</th>
+              <th>Product</th>
+              <th>Company</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="prod-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RIGHT: CRUD FORM -->
+    <div class="form-panel">
+      <form id="prod-form" class="form-box">
+        <h2 id="form-title">Add Product</h2>
+
+        <div class="form-row">
+          <i class="fas fa-barcode"></i>
+          <input id="barcode" type="text" placeholder="Barcode" required />
+        </div>
+        <button type="button" id="lookup-btn" class="btn btn-lookup">
+          <i class="fas fa-search"></i> Lookup
+        </button>
+
+        <div class="form-row">
+          <i class="fas fa-tag"></i>
+          <input id="name" type="text" placeholder="Product Name" required />
+        </div>
+        <div class="form-row">
+          <i class="fas fa-building"></i>
+          <input id="company" type="text" placeholder="Company Name" />
+        </div>
+        <div class="form-row">
+          <i class="fas fa-sort-numeric-up"></i>
+          <input id="quantity" type="number" min="0" placeholder="Quantity" required />
+        </div>
+        <div class="form-row">
+          <i class="fas fa-indian-rupee-sign"></i>
+          <input id="price" type="number" step="0.01" placeholder="Price" required />
+        </div>
+
+        <button type="submit" id="save-btn" class="btn btn-primary">Save</button>
+        <div id="form-feedback" class="feedback"></div>
+      </form>
+    </div>
+  </div>
+
+<script>
+
+    const role = localStorage.getItem("role");
+  const navEl = document.getElementById("nav-links");
+
+  const allLinks = [
+    { href: "dashboard.html", icon: "chart-line", label: "Dashboard" },
+    { href: "inventory.html", icon: "box-open", label: "Inventory", roles: ["admin", "owner"] },
+    { href: "order.html", icon: "clipboard-list", label: "Orders", roles: ["admin", "owner", "employee"] },
+    { href: "supplier.html", icon: "truck", label: "Supplier", roles: ["admin", "supplier"] },
+    { href: "buy.html", icon: "truck-loading", label: "Purchases", roles: ["admin", "owner", "employee"] },
+    { href: "sale.html", icon: "shopping-cart", label: "Sales", roles: ["admin", "owner", "employee"] },
+    { href: "logs.html", icon: "history", label: "User Logs", roles: ["admin", "owner"] },
+    { href: "admin.html", icon: "user-shield", label: "Admin", roles: ["admin", "owner"] },
+    { href: "profile.html", icon: "user-circle", label: "Profile" } // universal
+  ];
+
+  for (const link of allLinks) {
+    if (!link.roles || link.roles.includes(role)) {
+      const a = document.createElement("a");
+      a.href = link.href;
+      a.innerHTML = `<i class="fas fa-${link.icon}"></i> ${link.label}`;
+      navEl.appendChild(a);
+    }
+  }
+
+  const API         = 'http://localhost:5000/api';
+  const bodyEl      = document.getElementById('prod-body');
+  const form        = document.getElementById('prod-form');
+  const fb          = document.getElementById('form-feedback');
+  const titleEl     = document.getElementById('form-title');
+  const saveBtn     = document.getElementById('save-btn');
+  const lookupBtn   = document.getElementById('lookup-btn');
+  const searchInput = document.getElementById('searchInput');
+
+  let editBarcode = null;
+  let products    = [];
+
+  function getStatus(qty) {
+    if (qty === 0)      return 'out-of-stock';
+    if (qty < 50)       return 'shortage';
+    return 'in-stock';
+  }
+
+  function sortProducts(arr) {
+    const weight = { 'out-of-stock': 0, 'shortage': 1, 'in-stock': 2 };
+    return arr.sort((a, b) => {
+      const sa = getStatus(a.quantity), sb = getStatus(b.quantity);
+      if (sa !== sb) return weight[sa] - weight[sb];
+      return a.name.localeCompare(b.name);
+    });
+  }
+
+  function renderTable(list) {
+    bodyEl.innerHTML = '';
+    list.forEach((p, i) => {
+      const status = getStatus(p.quantity);
+      bodyEl.insertAdjacentHTML('beforeend', `
+        <tr>
+          <td>${i+1}</td>
+          <td>${p.barcode}</td>
+          <td>${p.name}</td>
+          <td>${p.company || '—'}</td>
+          <td>${p.quantity}</td>
+          <td>₹${p.price.toFixed(2)}</td>
+          <td>
+            <span class="status ${status}">
+              ${status === 'out-of-stock'
+                ? 'Out of Stock'
+                : status === 'shortage'
+                ? 'Shortage'
+                : 'In Stock'}
+            </span>
+          </td>
+          <td class="actions">
+            <button class="edit"   data-bc="${p.barcode}" title="Edit">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="delete" data-bc="${p.barcode}" title="Delete">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>
+        </tr>
+      `);
+    });
+
+    document.querySelectorAll('.edit').forEach(btn =>
+      btn.addEventListener('click', () => startEdit(btn.dataset.bc))
+    );
+    document.querySelectorAll('.delete').forEach(btn =>
+      btn.addEventListener('click', () => deleteProduct(btn.dataset.bc))
+    );
+  }
+
+  async function loadProducts() {
+    const res = await fetch(`${API}/products`);
+    products  = await res.json();
+    renderTable(sortProducts(products));
+  }
+
+  function filterTable(e) {
+    const term = e.target.value.toLowerCase();
+    const filtered = products.filter(p =>
+      p.barcode.includes(term) ||
+      p.name.toLowerCase().includes(term)
+    );
+    renderTable(sortProducts(filtered));
+  }
+
+  async function startEdit(barcode) {
+    const p = products.find(x => x.barcode === barcode);
+    if (!p) return;
+    editBarcode = barcode;
+    titleEl.textContent = 'Edit Product';
+    form.barcode.value  = p.barcode;
+    form.name.value     = p.name;
+    form.company.value  = p.company || '';
+    form.quantity.value = p.quantity;
+    form.price.value    = p.price;
+    saveBtn.textContent = 'Update';
+  }
+
+  function resetForm() {
+    editBarcode = null;
+    form.reset();
+    titleEl.textContent = 'Add Product';
+    saveBtn.textContent = 'Save';
+    fb.textContent = '';
+  }
+
+  async function deleteProduct(barcode) {
+    // direct delete without confirmation
+    const res = await fetch(`${API}/products/${barcode}`, { method: 'DELETE' });
+    if (!res.ok) {
+      alert('Failed to delete');
+      return;
+    }
+    loadProducts();
+  }
+
+  lookupBtn.addEventListener('click', async () => {
+    const code = form.barcode.value.trim();
+    if (!code) return;
+    lookupBtn.disabled = true;
+    fb.textContent = '';
+    try {
+      const resp = await fetch(
+        `https://world.openfoodfacts.org/api/v0/product/${code}.json`
+      );
+      const data = await resp.json();
+      if (data.status === 1 && data.product) {
+        form.name.value    = data.product.product_name || '';
+        form.company.value = data.product.brands || '';
+      } else {
+        fb.textContent = 'Not found on OpenFoodFacts';
+      }
+    } catch {
+      fb.textContent = 'Lookup failed';
+    } finally {
+      lookupBtn.disabled = false;
+    }
+  });
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    fb.textContent = '';
+    const payload = {
+      barcode:  form.barcode.value.trim(),
+      name:     form.name.value.trim(),
+      company:  form.company.value.trim(),
+      quantity: +form.quantity.value,
+      price:    +form.price.value
+    };
+    if (!payload.barcode || !payload.name) {
+      fb.textContent = 'Barcode & name required';
+      return;
+    }
+
+    let url  = `${API}/products`;
+    let opts = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    };
+
+    if (editBarcode) {
+      url        = `${API}/products/${editBarcode}`;
+      opts.method = 'PUT';
+    }
+
+    const res  = await fetch(url, opts);
+    const data = await res.json();
+    if (!res.ok) {
+      fb.textContent = data.error || 'Save failed';
+      return;
+    }
+    resetForm();
+    loadProducts();
+  });
+
+  searchInput.addEventListener('input', filterTable);
+  window.addEventListener('DOMContentLoaded', loadProducts);
+</script>
+</body>
+</html>
